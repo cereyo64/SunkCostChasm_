@@ -6,6 +6,8 @@ TagManager:
   tags:
   - Walls
   - StartingRoom
+  - PlayerFollowCam
+  - RoomCam
   layers:
   - Default
   - TransparentFX
@@ -42,6 +44,9 @@ TagManager:
   m_SortingLayers:
   - name: Default
     uniqueID: 0
+    locked: 0
+  - name: WorldVoid
+    uniqueID: 2600482765
     locked: 0
   - name: Foreground
     uniqueID: 4115824789

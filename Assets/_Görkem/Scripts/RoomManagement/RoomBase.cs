@@ -16,7 +16,7 @@ public class RoomBase : MonoBehaviour
 
        public float transitionTime;
 
-       
+       public CameraManager.CameraBehaviour baseCameraBehaviour;
     }
     public void OnDrawGizmosSelected()
     {

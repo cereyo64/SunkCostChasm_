@@ -10,11 +10,24 @@ public class Doors : MonoBehaviour, IInteractable
     public string RequiredItemName { get => requiredItemName ; set => requiredItemName = value; }
     public bool CanInteract { get => canInteract ; set => canInteract = value; }
     public string InteractionName { get => interactionName ; set => interactionName = value; }
+    public bool IsProgressedInteractable { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+    public float CompleteTime { get => 0; set => value = 0; }
 
     public void Interact()
     {
         SendPlayerToNextRoom();
+    }
+    public void InteractCancel()
+    {
        
+    }
+    public void InteractEnd()
+    {
+        
+    }
+    public void InteractTick()
+    {
+        
     }
 
     public void InteractWithItem(string itemName)

@@ -1,7 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
+using Unity.Cinemachine;
 public class RoomManager : MonoBehaviour
 {
     public RoomBase currentRoom;
@@ -12,7 +12,7 @@ public class RoomManager : MonoBehaviour
 
     public float elapsedTime;
 
-    public Camera roomCamera;
+    public CinemachineCamera roomCamera;
 
     public void OnEnable()
     {
@@ -58,48 +58,30 @@ public class RoomManager : MonoBehaviour
 
             currentRoom.gameObject.SetActive(true);
 
-
             GameObject playerObj = GameObject.FindGameObjectWithTag("Player");
 
+            //Teleport player to spawn point.
             playerObj.transform.position = currentRoom.playerSpawnPoint.position;
 
-            StartCoroutine(MoveCameraInTime(currentRoom));
-            // Camera.main.transform.position = currentRoom.transform.TransformPoint(currentRoom.roomCameraOffset);
+
+            switch (currentRoom.transitionSettings.baseCameraBehaviour)
+            {
+                case CameraManager.CameraBehaviour.PlayerFollowCamera:
+
+                    CameraEvents.SwitchToPlayerFollowCamera();
+
+                break;
+
+                case CameraManager.CameraBehaviour.RoomCamera:
+
+                    CameraEvents.SwitchToRoomCamera(currentRoom);
+
+                break;
+
+            }
+
         }
     }
-
-    public IEnumerator MoveCameraInTime(RoomBase roomBase)
-    {
-        Vector3 A = roomCamera.transform.position;
-        Vector3 B = roomBase.transform.TransformPoint(roomBase.transitionSettings.roomCameraOffset);
-
-        float transitionTime = roomBase.transitionSettings.transitionTime;
-
-        if (transitionTime <= 0f)
-        {
-            roomCamera.transform.position = B;
-            yield break;
-        }
-
-        elapsedTime = 0f;
-
-        while (elapsedTime < transitionTime)
-        {
-            elapsedTime += Time.deltaTime;
-
-            float progress = Mathf.Clamp01(elapsedTime / transitionTime);
-
-            roomCamera.transform.position = Vector3.Lerp(A, B, progress);
-
-            yield return null;
-        }
-
-        //roomCamera.transform.position = B;
-       // elapsedTime = 0f;
-        Debug.Log("Reached the camera point for this room !");
-    }
-
-
     private void RoomEvents_OnSwitchToNewRoom(object sender, string newRoomName)
     {
         if (newRoomName == null) return;
@@ -107,7 +89,6 @@ public class RoomManager : MonoBehaviour
         SwitchToNewRoom(newRoomName);
 
     }
-
     public void ReturnToBase()
     {
 

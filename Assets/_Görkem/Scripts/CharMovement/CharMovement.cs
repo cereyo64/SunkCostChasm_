@@ -48,7 +48,9 @@ public class CharMovement : MonoBehaviour
     {
         if (Mathf.Abs(movement) > 0)
         {
-            m_rb2D.linearVelocityX = movement * movementSpeed * Time.fixedDeltaTime;
+            Vector2 calcMovement = transform.position + transform.right * movement * movementSpeed * Time.fixedDeltaTime;
+
+            m_rb2D.MovePosition(calcMovement);
         }
 
         transformMatrix = transform.localToWorldMatrix;
