@@ -5,6 +5,7 @@ TagManager:
   serializedVersion: 3
   tags:
   - Walls
+  - StartingRoom
   layers:
   - Default
   - TransparentFX
@@ -12,8 +13,8 @@ TagManager:
   - Walls
   - Water
   - UI
-  - 
-  - 
+  - Interactable
+  - Ground
   - 
   - 
   - 
@@ -53,6 +54,9 @@ TagManager:
     locked: 0
   - name: Background
     uniqueID: 1257813059
+    locked: 0
+  - name: Player
+    uniqueID: 620498953
     locked: 0
   m_RenderingLayers:
   - Default

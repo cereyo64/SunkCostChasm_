@@ -7,7 +7,7 @@ public class PlayerMovement : MonoBehaviour
 {
 
     [Header("Refs")]
-    public Rigidbody rb;
+    public Rigidbody2D rb;
     public ReferanceManager RF;
     public Camera Cm;
 
@@ -20,20 +20,20 @@ public class PlayerMovement : MonoBehaviour
     public float maxVerticalSpeed;
 
     [Header("Ground Check (Raycast)")]
-    public LayerMask groundMask;          // "Ground" katmanýný seç
+    public LayerMask groundMask;          // "Ground" katmanï¿½nï¿½ seï¿½
     public float GroundCheckDistance;
     public bool CanJump;
-    public bool isGrounded;// Inspector'da gözlemlemek için
+    public bool isGrounded;// Inspector'da gï¿½zlemlemek iï¿½in
     public bool CanDoubleJump; // Double Jump kontrol et
 
-    private Collider _col;
+    private Collider2D _col;
 
     [Header("Crouch")]
     public KeyCode crouchKey;
-    public LayerMask environmentMask;     // Tavan/duvar/zemin (Player hariç!)
-    public CapsuleCollider NormalSize;    // Ayakta collider
-    public CapsuleCollider CrouchSize;    // Eðik collider
-    CapsuleCollider _currentCol;          // Aktif olan
+    public LayerMask environmentMask;     // Tavan/duvar/zemin (Player hariï¿½!)
+    public CapsuleCollider2D NormalSize;    // Ayakta collider
+    public CapsuleCollider2D CrouchSize;    // Eï¿½ik collider
+    private CapsuleCollider2D _currentCol;          // Aktif olan
     public bool isCrouching;
 
     [Header("Air Fast-Fall (Double-Tap)")]
@@ -42,15 +42,15 @@ public class PlayerMovement : MonoBehaviour
     public float FastFallForce;
 
     [Header("Ceiling Check (Rays)")]
-    public bool CeilingUseTripleRays = true; // kapatýrsan sadece merkez ray kullanýlýr
-    public float CeilingRayStartOffset = 0.3f; // merkezden yukarý baþlat
-    public float CeilingRayHorizontalInset = 0.05f; // sol/sað ray'ler kenardan içeri ofset
-    public float CeilingRaySkin = 0.01f; // yan/üst güvenlik payý
+    public bool CeilingUseTripleRays = true; // kapatï¿½rsan sadece merkez ray kullanï¿½lï¿½r
+    public float CeilingRayStartOffset = 0.3f; // merkezden yukarï¿½ baï¿½lat
+    public float CeilingRayHorizontalInset = 0.05f; // sol/saï¿½ ray'ler kenardan iï¿½eri ofset
+    public float CeilingRaySkin = 0.01f; // yan/ï¿½st gï¿½venlik payï¿½
 
     [Header("Ceiling / Stand-up Tuning")]
-    public float StandClearanceMultiplier = 1f;   // 0.5–1.5 tipik
-    public float StandExtraClearance = 0.0f;    // metre cinsinden ek boþluk
-    public float CeilingSkin = 0.01f;   // yanlardan güvenlik payý
+    public float StandClearanceMultiplier = 1f;   // 0.5ï¿½1.5 tipik
+    public float StandExtraClearance = 0.0f;    // metre cinsinden ek boï¿½luk
+    public float CeilingSkin = 0.01f;   // yanlardan gï¿½venlik payï¿½
 
     [Header("Dodge (Minimal)")]
     public KeyCode DodgeKey = KeyCode.LeftShift;
@@ -60,14 +60,14 @@ public class PlayerMovement : MonoBehaviour
     public bool AllowAirDodge = true;
 
     [Header("Dodge Stop (Ray)")]
-    public LayerMask dodgeStopMask;       // yalnýz bu katmanlar dursun
+    public LayerMask dodgeStopMask;       // yalnï¿½z bu katmanlar dursun
     public float DodgeStopRayLength = 0.55f; // merkezden ileri
 
     [Header("Climb (Low-Obstacle Vault)")]
     public bool EnableClimb = true;
-    public float ClimbRayUpOffset = 0.45f;   // üst ray için +Y
-    public float ClimbDuration = 0.9f;   // 1 sn civarý
-    public float ClimbUp = 1.0f;   // yukarý mesafe
+    public float ClimbRayUpOffset = 0.45f;   // ï¿½st ray iï¿½in +Y
+    public float ClimbDuration = 0.9f;   // 1 sn civarï¿½
+    public float ClimbUp = 1.0f;   // yukarï¿½ mesafe
     public float ClimbForward = 0.8f;   // ileri mesafe
 
 
@@ -78,21 +78,21 @@ public class PlayerMovement : MonoBehaviour
     public bool IsCanWallJump;
     bool CantTakeDamage;
     float _nextDodgeTime = 0f;
-    float _facing = 1f; // hareket kodunda güncelleniyor
+    float _facing = 1f; // hareket kodunda gï¿½ncelleniyor
     bool canMoveLeft = true, canMoveRight = true;
 
     //[Header("Wall Probe")]
-    float wallCheckInset = 0.02f;      // kenardan içeri baþlat
-    float wallCheckDistance = 0.06f;   // kýsa mesafe kontrol
-    float wallCheckHeight = 0.6f;      // gövde ortasý civarý
+    float wallCheckInset = 0.02f;      // kenardan iï¿½eri baï¿½lat
+    float wallCheckDistance = 0.06f;   // kï¿½sa mesafe kontrol
+    float wallCheckHeight = 0.6f;      // gï¿½vde ortasï¿½ civarï¿½
 
     bool _blockLeft, _blockRight;
 
     void Start()
     {
-        TryGetComponent(out _col);
+        TryGetComponent<Collider2D>(out _col);
 
-        // Baþlangýç: ayakta
+        // Baï¿½langï¿½ï¿½: ayakta
         _currentCol = NormalSize;
         NormalSize.enabled = true;
         CrouchSize.enabled = false;
@@ -104,10 +104,10 @@ public class PlayerMovement : MonoBehaviour
     void FixedUpdate()
     {
         GroundCheck();
-        ProbeWalls();        // önce duvar var mý, bak
+        ProbeWalls();        // ï¿½nce duvar var mï¿½, bak
         MovementFixed();     // fiziksel hareket
 
-        //Zýplarken fazla uçmasýn diye
+        //Zï¿½plarken fazla uï¿½masï¿½n diye
         if (rb.linearVelocity.y > maxVerticalSpeed)
         {
             rb.linearVelocity = new Vector2(rb.linearVelocity.x, maxVerticalSpeed);
@@ -120,8 +120,8 @@ public class PlayerMovement : MonoBehaviour
             TryStartClimb();
 
         jump();
-        HandleCrouch();  // Eðilme Kodlarý
-        HandleDodge();   // Dodge kodlarý
+        HandleCrouch();  // Eï¿½ilme Kodlarï¿½
+        HandleDodge();   // Dodge kodlarï¿½
     }
 
     void LateUpdate()
@@ -136,12 +136,12 @@ public class PlayerMovement : MonoBehaviour
         var b = _currentCol.bounds; // aktif collider
         float yMid = Mathf.Clamp(b.center.y, b.min.y + wallCheckHeight * 0.25f, b.max.y - wallCheckHeight * 0.25f);
 
-        Vector3 leftOrigin = new Vector3(b.min.x + wallCheckInset, yMid, b.center.z);
-        Vector3 rightOrigin = new Vector3(b.max.x - wallCheckInset, yMid, b.center.z);
+        Vector2 leftOrigin = new Vector2(b.min.x + wallCheckInset, yMid);
+        Vector2 rightOrigin = new Vector2(b.max.x - wallCheckInset, yMid);
 
-        if (Physics.Raycast(leftOrigin, Vector3.left, wallCheckDistance, environmentMask, QueryTriggerInteraction.Ignore))
+        if (Physics2D.Raycast(leftOrigin, Vector2.left, wallCheckDistance, environmentMask))
             _blockLeft = true;
-        if (Physics.Raycast(rightOrigin, Vector3.right, wallCheckDistance, environmentMask, QueryTriggerInteraction.Ignore))
+        if (Physics2D.Raycast(rightOrigin, Vector2.right, wallCheckDistance, environmentMask))
             _blockRight = true;
     }
 
@@ -157,22 +157,22 @@ public class PlayerMovement : MonoBehaviour
         if (inputX < 0f && _blockLeft) inputX = 0f;
         if (inputX > 0f && _blockRight) inputX = 0f;
 
-        Vector3 delta = new Vector3(inputX * MoveSpeed * Time.fixedDeltaTime, 0f, 0f);
-        rb.MovePosition(rb.position + delta);
+        Vector2 delta = new Vector2(inputX * MoveSpeed * Time.fixedDeltaTime, 0f);
+        rb.MovePosition((Vector2)rb.position + (Vector2)delta);
     }
 
 
 
     void GroundCheck()
     {
-        Vector3 LeftSide = new Vector3(transform.position.x - 0.3f, transform.position.y, transform.position.z);
-        Vector3 RightSide = new Vector3(transform.position.x + 0.3f, transform.position.y, transform.position.z);
+        Vector2 LeftSide = new Vector2(transform.position.x - groundSideOffset, transform.position.y);
+        Vector2 RightSide = new Vector2(transform.position.x + groundSideOffset, transform.position.y);
 
-        if (Physics.Raycast(transform.position, Vector3.down, GroundCheckDistance, groundMask, QueryTriggerInteraction.Ignore))
+        if (Physics2D.Raycast(transform.position, Vector2.down, GroundCheckDistance, groundMask))
             isGrounded = true;
-        else if (Physics.Raycast(LeftSide, Vector3.down, GroundCheckDistance, groundMask, QueryTriggerInteraction.Ignore))
+        else if (Physics2D.Raycast(LeftSide, Vector2.down, GroundCheckDistance, groundMask))
             isGrounded = true;
-        else if (Physics.Raycast(RightSide, Vector3.down, GroundCheckDistance, groundMask, QueryTriggerInteraction.Ignore))
+        else if (Physics2D.Raycast(RightSide, Vector2.down, GroundCheckDistance, groundMask))
             isGrounded = true;
         else { isGrounded = false; }
     }
@@ -183,7 +183,7 @@ public class PlayerMovement : MonoBehaviour
 
         if (ConsumeAirFastFallRequest())
         {
-            rb.AddForce(Vector3.down * (FastFallForce), ForceMode.Impulse);
+            rb.AddForce(Vector2.down * (FastFallForce), ForceMode2D.Impulse);
             canMoveLeft = false;
             canMoveRight = false;
             IsFastFalling = true;
@@ -194,7 +194,7 @@ public class PlayerMovement : MonoBehaviour
     {
         if (isClimbing) return;
 
-        // 1. Zemin ve Duvar Kontrollerini Güncelle
+        // 1. Zemin ve Duvar Kontrollerini Gï¿½ncelle
         if (isGrounded)
         {
             CanJump = true;
@@ -212,25 +212,26 @@ public class PlayerMovement : MonoBehaviour
             CanJump = false;
         }
 
-        // 2. TEK BÝR TUÞ BASIMINDA KARAR VER (Input.GetKeyDown burada olmalý)
+        // 2. TEK Bï¿½R TUï¿½ BASIMINDA KARAR VER (Input.GetKeyDown burada olmalï¿½)
         if (Input.GetKeyDown(JumpKey))
         {
-            // ÖNCELÝK SIRALAMASI ÇOK ÖNEMLÝ:
+            // ï¿½NCELï¿½K SIRALAMASI ï¿½OK ï¿½NEMLï¿½:
 
-            // A. WALL JUMP (Eðer duvardaysan ve bekleme süresi bittiyse)
-            // Not: Burada 'IsCanWallJump' senin cooldown deðiþkenin olmalý
+            // A. WALL JUMP (Eï¿½er duvardaysan ve bekleme sï¿½resi bittiyse)
+            // Not: Burada 'IsCanWallJump' senin cooldown deï¿½iï¿½kenin olmalï¿½
             if (!isGrounded && (_blockLeft || _blockRight) && IsCanWallJump)
             {
                 StartCoroutine(WallJumping());
-                return; // Wall jump yaptýysan diðer zýplamalarý kontrol etme
+                return; // Wall jump yaptï¿½ysan diï¿½er zï¿½plamalarï¿½ kontrol etme
             }
 
             // B. NORMAL JUMP
             if (CanJump)
             {
-                rb.linearVelocity = new Vector2(rb.linearVelocity.x, 0f); // Temiz zýplama
-                rb.AddForce(Vector3.up * JumpForce, ForceMode.Impulse);
-                CanJump = false; // Havaya kalktýðý an normal zýplama biter
+                //rb.linearVelocity = new Vector2(rb.linearVelocity.x, 0f); // Temiz zï¿½plama
+                
+                rb.AddForce(Vector2.up * JumpForce, ForceMode2D.Impulse);
+                CanJump = false; // Havaya kalktï¿½ï¿½ï¿½ an normal zï¿½plama biter
                 return;
             }
 
@@ -238,7 +239,7 @@ public class PlayerMovement : MonoBehaviour
             if (CanDoubleJump && !isGrounded)
             {
                 rb.linearVelocity = new Vector2(rb.linearVelocity.x, 0f);
-                rb.AddForce(Vector3.up * (normalJumpForce * 0.8f), ForceMode.Impulse);
+                rb.AddForce(Vector2.up * (normalJumpForce * 0.8f), ForceMode2D.Impulse);
                 CanDoubleJump = false;
                 return;
             }
@@ -249,6 +250,7 @@ public class PlayerMovement : MonoBehaviour
 
     float _sLastTap = -1f;
     bool _airFastFallRequested = false;
+    private float groundSideOffset;
 
     void DetectAirFastFallDoubleTap()
     {
@@ -267,7 +269,7 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
-    // FixedUpdate (veya hareket fiziðinin olduðu yerde) kullan:
+    // FixedUpdate (veya hareket fiziï¿½inin olduï¿½u yerde) kullan:
     public bool ConsumeAirFastFallRequest()
     {
         if (_airFastFallRequested)
@@ -281,17 +283,17 @@ public class PlayerMovement : MonoBehaviour
     // -------- Crouch (Sade) --------
     void HandleCrouch()
     {
-        if (isDodging) return; // Dodge sürerken crouch'u biz kontrol ediyoruz
+        if (isDodging) return; // Dodge sï¿½rerken crouch'u biz kontrol ediyoruz
 
         bool hold = Input.GetKey(crouchKey);
 
         if (hold)
         {
-            if (!isCrouching) SetCrouch(true); // eðil
+            if (!isCrouching) SetCrouch(true); // eï¿½il
             return;
         }
 
-        // Ayaða kalkmak istiyor -> baþüstü boþsa kalk
+        // Ayaï¿½a kalkmak istiyor -> baï¿½ï¿½stï¿½ boï¿½sa kalk
         if (isCrouching && !IsStandBlocked())
             SetCrouch(false);
     }
@@ -300,62 +302,62 @@ public class PlayerMovement : MonoBehaviour
     {
         isCrouching = crouch;
 
-        // Hýz
+        // Hï¿½z
         MoveSpeed = crouch ? CrouchSpeed : WalkSpeed;
         CanJump = crouch ? false : true;
 
-        // Collider aç/kapat
+        // Collider aï¿½/kapat
         NormalSize.enabled = !crouch;
         CrouchSize.enabled = crouch;
         _currentCol = crouch ? CrouchSize : NormalSize;
     }
 
-    // Tek bir yukarý ray: “Normal” boya dönmek için yeterli boþluk var mý?
+    // Tek bir yukarï¿½ ray: ï¿½Normalï¿½ boya dï¿½nmek iï¿½in yeterli boï¿½luk var mï¿½?
     bool IsStandBlocked()
     {
-        // Þu anki (çoðunlukla crouch) collider AABB
+        // ï¿½u anki (ï¿½oï¿½unlukla crouch) collider AABB
         Bounds cb = _currentCol.bounds;
 
-        // Ayakta yarým yükseklik (world)
+        // Ayakta yarï¿½m yï¿½kseklik (world)
         float sy = transform.lossyScale.y;
-        float normalHalf = (NormalSize.height * sy) * 0.5f;
+        float normalHalf = (NormalSize.size.y * sy) * 0.5f;
 
-        // Ray baþlangýç yüksekliði: merkezden +0.3 m
-        Vector3 baseCenter = cb.center;
+        // Ray baï¿½langï¿½ï¿½ yï¿½ksekliï¿½i: merkezden +0.3 m
+        Vector2 baseCenter = cb.center;
         float startY = baseCenter.y + CeilingRayStartOffset;
 
-        // Ray uzunluðu: ayakta tepeye kadar olan alan - küçük skin
+        // Ray uzunluï¿½u: ayakta tepeye kadar olan alan - kï¿½ï¿½ï¿½k skin
         float rayLen = Mathf.Max(0.01f, normalHalf - CeilingRayStartOffset - CeilingRaySkin);
 
         // Merkez ray
-        Vector3 originCenter = new Vector3(baseCenter.x, startY, baseCenter.z);
+        Vector2 originCenter = new Vector2(baseCenter.x, startY);
 
-        bool HitRay(Vector3 o)
+        bool HitRay(Vector2 o)
         {
-            return Physics.Raycast(
-                o, Vector3.up, rayLen,
-                environmentMask, QueryTriggerInteraction.Ignore
+            return Physics2D.Raycast(
+                o, Vector2.up, rayLen,
+                environmentMask
             );
         }
 
         if (!CeilingUseTripleRays)
         {
 #if UNITY_EDITOR
-            Debug.DrawRay(originCenter, Vector3.up * rayLen, Color.yellow);
+            Debug.DrawRay(originCenter, Vector2.up * rayLen, Color.yellow);
 #endif
             return HitRay(originCenter);
         }
 
-        // Sol/sað ray'ler: kenardan "inset" kadar içeriden
+        // Sol/saï¿½ ray'ler: kenardan "inset" kadar iï¿½eriden
         float xEdge = Mathf.Max(0.01f, cb.extents.x - CeilingRaySkin);
         float xOff = Mathf.Max(0f, xEdge - CeilingRayHorizontalInset);
-        Vector3 left = originCenter + Vector3.left * xOff;
-        Vector3 right = originCenter + Vector3.right * xOff;
+        Vector2 left = originCenter + Vector2.left * xOff;
+        Vector2 right = originCenter + Vector2.right * xOff;
 
 #if UNITY_EDITOR
-        Debug.DrawRay(originCenter, Vector3.up * rayLen, Color.yellow);
-        Debug.DrawRay(left, Vector3.up * rayLen, Color.yellow);
-        Debug.DrawRay(right, Vector3.up * rayLen, Color.yellow);
+        Debug.DrawRay(originCenter, Vector2.up * rayLen, Color.yellow);
+        Debug.DrawRay(left, Vector2.up * rayLen, Color.yellow);
+        Debug.DrawRay(right, Vector2.up * rayLen, Color.yellow);
 #endif
 
         return HitRay(originCenter) || HitRay(left) || HitRay(right);
@@ -373,48 +375,48 @@ public class PlayerMovement : MonoBehaviour
     {
         isDodging = true;
 
-        // Yön: A/D varsa onu, yoksa bakýþ yönün
+        // Yï¿½n: A/D varsa onu, yoksa bakï¿½ï¿½ yï¿½nï¿½n
         int xDir = 0;
         if (Input.GetKey(KeyCode.A)) xDir = -1;
         else if (Input.GetKey(KeyCode.D)) xDir = 1;
         else xDir = (_facing >= 0f) ? 1 : -1;
 
-        Vector3 dir = new Vector3(xDir, 0f, 0f);
+        Vector2 dir = new Vector2(xDir, 0f);
         float startX = rb.position.x;
         float targetX = startX + xDir * DodgeDistance;
 
-        // Y ve rotasyonu kilitle, doðal hýzlanma ver
-        RigidbodyConstraints saved = rb.constraints;
-        rb.constraints = saved | RigidbodyConstraints.FreezePositionY | RigidbodyConstraints.FreezeRotation;
-        rb.AddForce(dir * DodgeImpulse, ForceMode.Impulse);
+        // Y ve rotasyonu kilitle, doï¿½al hï¿½zlanma ver
+        RigidbodyConstraints2D saved = rb.constraints;
+        rb.constraints = saved | RigidbodyConstraints2D.FreezePositionY | RigidbodyConstraints2D.FreezeRotation;
+        rb.AddForce(dir * DodgeImpulse, ForceMode2D.Impulse);
 
         const float tol = 0.005f;
-        float deadline = Time.time + 1f; // güvenlik
+        float deadline = Time.time + 1f; // gï¿½venlik
 
         while (true)
         {
             yield return new WaitForFixedUpdate();
 
-            // 1) Ýleri ray çarparsa BU dodge anýnda biter
+            // 1) ï¿½leri ray ï¿½arparsa BU dodge anï¿½nda biter
             Bounds cb = _currentCol ? _currentCol.bounds : _col.bounds;
-            Vector3 origin = cb.center;
+            Vector2 origin = cb.center;
 
-            if (Physics.Raycast(origin, dir, DodgeStopRayLength, dodgeStopMask, QueryTriggerInteraction.Ignore))
+            if (Physics2D.Raycast(origin, dir, DodgeStopRayLength, dodgeStopMask))
             { targetX = rb.position.x; break; }
 
-            // 2) Sabit menzile ulaþýldý mý?
+            // 2) Sabit menzile ulaï¿½ï¿½ldï¿½ mï¿½?
             float traveled = Mathf.Abs(rb.position.x - startX);
             if (traveled + tol >= DodgeDistance ||
                 (xDir > 0 && rb.position.x >= targetX - tol) ||
                 (xDir < 0 && rb.position.x <= targetX + tol)) break;
 
-            // 3) Güvenlik: olaðan dýþý durum
+            // 3) Gï¿½venlik: olaï¿½an dï¿½ï¿½ï¿½ durum
             if (Time.time > deadline) { targetX = rb.position.x; break; }
         }
 
-        // Snap + 1 fizik karesi X dondur -> momentum sýfýr
-        rb.MovePosition(new Vector3(targetX, rb.position.y, rb.position.z));
-        rb.constraints = saved | RigidbodyConstraints.FreezePositionX | RigidbodyConstraints.FreezeRotation;
+        // Snap + 1 fizik karesi X dondur -> momentum sï¿½fï¿½r
+        rb.MovePosition(new Vector2(targetX, rb.position.y));
+        rb.constraints = saved | RigidbodyConstraints2D.FreezePositionX | RigidbodyConstraints2D.FreezeRotation;
         yield return new WaitForFixedUpdate();
         rb.constraints = saved;
 
@@ -427,7 +429,7 @@ public class PlayerMovement : MonoBehaviour
         if (!EnableClimb || isClimbing || isDodging) return;
 
         int dir;
-        // ESKÝ: if (CanClimb(out dir) && Input.GetKeyDown(JumpKey))
+        // ESKï¿½: if (CanClimb(out dir) && Input.GetKeyDown(JumpKey))
         if (CanClimb(out dir))
             StartCoroutine(ClimbRoutine(dir));
     }
@@ -442,19 +444,19 @@ public class PlayerMovement : MonoBehaviour
 
         var b = _currentCol ? _currentCol.bounds : _col.bounds;
 
-        // RAY BAÞLANGICI: ÖN YÜZ (minX/maxX) + küçük iç ofset
+        // RAY BAï¿½LANGICI: ï¿½N Yï¿½Z (minX/maxX) + kï¿½ï¿½ï¿½k iï¿½ ofset
         float frontX = (dir > 0) ? b.max.x : b.min.x;
         float inset = Mathf.Max(0.001f, wallCheckInset);
-        Vector3 front = new Vector3(frontX - dir * inset, b.center.y, b.center.z);
+        Vector2 front = new Vector2(frontX - dir * inset, b.center.y);
 
-        Vector3 lowOrigin = front + Vector3.down * ClimbRayUpOffset;// alt ray
-        Vector3 highOrigin = front + Vector3.up * ClimbRayUpOffset; // üst ray
-        Vector3 fwd = new Vector3(dir, 0f, 0f);
+        Vector2 lowOrigin = front + Vector2.down * ClimbRayUpOffset;// alt ray
+        Vector2 highOrigin = front + Vector2.up * ClimbRayUpOffset; // ï¿½st ray
+        Vector2 fwd = new Vector2(dir, 0f);
 
-        bool lowHit = Physics.Raycast(lowOrigin, fwd, wallCheckDistance * 5, environmentMask, QueryTriggerInteraction.Ignore);
-        bool highHit = Physics.Raycast(highOrigin, fwd, wallCheckDistance * 5, environmentMask, QueryTriggerInteraction.Ignore);
+        bool lowHit = Physics2D.Raycast(lowOrigin, fwd, wallCheckDistance * 5, environmentMask);
+        bool highHit = Physics2D.Raycast(highOrigin, fwd, wallCheckDistance * 5, environmentMask);
 
-        return lowHit && !highHit; // alt görüyor, üst görmüyorsa: týrmanýlabilir alçak engel
+        return lowHit && !highHit; // alt gï¿½rï¿½yor, ï¿½st gï¿½rmï¿½yorsa: tï¿½rmanï¿½labilir alï¿½ak engel
     }
 
 
@@ -462,13 +464,13 @@ public class PlayerMovement : MonoBehaviour
     {
         isClimbing = true;
 
-        // hedef pozisyon (yukarý+ileri)
-        Vector3 start = rb.position;
-        Vector3 target = start + Vector3.up * ClimbUp + new Vector3(dir * ClimbForward, 0f, 0f);
+        // hedef pozisyon (yukarï¿½+ileri)
+        Vector2 start = rb.position;
+        Vector2 target = start + Vector2.up * ClimbUp + new Vector2(dir * ClimbForward, 0f);
 
-        // güvenli kýsýtlar
+        // gï¿½venli kï¿½sï¿½tlar
         var saved = rb.constraints;
-        rb.constraints = saved | RigidbodyConstraints.FreezeRotation;
+        rb.constraints = saved | RigidbodyConstraints2D.FreezeRotation;
 
         float t = 0f, d = Mathf.Max(0.1f, ClimbDuration);
         while (t < d)
@@ -477,15 +479,15 @@ public class PlayerMovement : MonoBehaviour
 
             float u = t / d;                  // 0.1
             float s = u * u * (3f - 2f * u); // SmoothStep
-            Vector3 pos = Vector3.Lerp(start, target, s);
+            Vector2 pos = Vector2.Lerp(start, target, t);
 
-            rb.MovePosition(new Vector3(pos.x, pos.y, rb.position.z));
+            rb.MovePosition(new Vector2(pos.x, pos.y));
             t += Time.fixedDeltaTime;
         }
 
-        // küçük "snap" ve momentum öldürme
-        rb.MovePosition(new Vector3(target.x, target.y, rb.position.z));
-        rb.constraints = saved | RigidbodyConstraints.FreezePositionX | RigidbodyConstraints.FreezeRotation;
+        // kï¿½ï¿½ï¿½k "snap" ve momentum ï¿½ldï¿½rme
+        rb.MovePosition(new Vector2(target.x, target.y));
+        rb.constraints = saved | RigidbodyConstraints2D.FreezePositionX | RigidbodyConstraints2D.FreezeRotation;
         yield return new WaitForFixedUpdate();
         rb.constraints = saved;
 
@@ -495,37 +497,67 @@ public class PlayerMovement : MonoBehaviour
 
     public void CameraFollow()
     {
-        Cm.transform.position = new Vector3(transform.position.x, transform.position.y, Cm.transform.position.z);
+        Cm.transform.position = new Vector3(transform.position.x, transform.position.y, -10);
     }
 
     IEnumerator WallJumping()
     {
-        IsCanWallJump = false; // Kapýyý kilitle
+        IsCanWallJump = false; // Kapï¿½yï¿½ kilitle
 
         rb.linearVelocity = Vector2.zero;
 
-        rb.AddForce(Vector2.up * wallJumpForce, ForceMode.Impulse);
+        rb.AddForce(Vector2.up * wallJumpForce, ForceMode2D.Force);
 
-        if (_blockLeft) 
+            if (_blockLeft) 
         {
-            rb.AddForce(Vector2.left * -(wallJumpVerticalForce), ForceMode.Impulse);
+            rb.AddForce(Vector2.left * -(wallJumpVerticalForce), ForceMode2D.Impulse);
             canMoveLeft = false;
             yield return new WaitForSeconds(0.25f);
             if (!canMoveLeft) canMoveLeft = true;
-            rb.linearVelocity = new Vector2(0f, rb.linearVelocity.y);
+                rb.linearVelocity = new Vector2(0f, rb.linearVelocity.y);
         }
 
         if (_blockRight) 
         {
-            rb.AddForce(Vector2.left * wallJumpVerticalForce, ForceMode.Impulse); 
+            rb.AddForce(Vector2.left * wallJumpVerticalForce, ForceMode2D.Impulse); 
             canMoveRight = false;
             yield return new WaitForSeconds(0.25f);
             if (!canMoveRight) canMoveRight = true;
-            rb.linearVelocity = new Vector2(0f, rb.linearVelocity.y);
+                rb.linearVelocity = new Vector2(0f, rb.linearVelocity.y);
         } 
 
         yield return new WaitForSeconds(0.25f);
 
-        IsCanWallJump = true; // Yarým saniye sonra kapýyý tekrar aç
+        IsCanWallJump = true; // Yarï¿½m saniye sonra kapï¿½yï¿½ tekrar aï¿½
+    }
+
+
+
+
+
+    private void OnDrawGizmos()
+    {
+        Vector2 LeftSide = new Vector2(transform.position.x - 0.3f, transform.position.y);
+        Vector2 RightSide = new Vector2(transform.position.x + 0.3f, transform.position.y);
+
+        Vector2 downPoint = (Vector2)transform.position + Vector2.down * GroundCheckDistance;
+
+        Vector2 L_downPoint = LeftSide + Vector2.down * GroundCheckDistance;
+        Vector2 R_downPoint = RightSide + Vector2.down * GroundCheckDistance;
+
+        if (isGrounded)
+        {
+            Gizmos.color = Color.green;
+        }
+        else
+        {
+            Gizmos.color = Color.red;
+        }
+
+        Gizmos.DrawLine(LeftSide,L_downPoint);
+        Gizmos.DrawLine(RightSide, R_downPoint);
+        Gizmos.DrawLine( (Vector2)transform.position, downPoint);
+        
+      
     }
 }
