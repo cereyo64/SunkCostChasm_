@@ -3,27 +3,16 @@ using UnityEngine;
 
 public class RoomEvents
 {
-
-    public static event EventHandler<string> OnSwitchToNewRoom;
-    public static event EventHandler OnSwitchToPlayerFollowCam;
-    public static event EventHandler OnSwitchToRoomCamPoint;
-    public static void SwitchToNewRoom(string roomName)
+    public static event EventHandler<OnSwitchedRoomEventArgs> OnSwitchToNewRoom;
+    public static void SwitchToNewRoom(string SwitchedRoomName, RoomBase switchedRoom)
     {
-        OnSwitchToNewRoom?.Invoke(null,roomName);
+        OnSwitchToNewRoom?.Invoke(null, new OnSwitchedRoomEventArgs {switchedRoomName = SwitchedRoomName, switchedRoom = switchedRoom });
     }
 
-
-    public static void SwitchCameraToFollowPlayer()
+    public class OnSwitchedRoomEventArgs : EventArgs
     {
-        OnSwitchToPlayerFollowCam?.Invoke(null, EventArgs.Empty);
+        public string switchedRoomName;
+
+        public RoomBase switchedRoom;
     }
-
-    public static void SwitchCameraToRoomPoint()
-    {
-
-        OnSwitchToRoomCamPoint?.Invoke(null, EventArgs.Empty);
-
-    }
-
-
 }

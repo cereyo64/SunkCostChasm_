@@ -41,7 +41,7 @@ public class Doors : MonoBehaviour, IInteractable
     public void SendPlayerToNextRoom()
     {
 
-        RoomEvents.SwitchToNewRoom(leadingRoom);
+       // RoomEvents.SwitchToNewRoom(leadingRoom);
 
         Debug.Log($"Player travels to {leadingRoom}");
     }

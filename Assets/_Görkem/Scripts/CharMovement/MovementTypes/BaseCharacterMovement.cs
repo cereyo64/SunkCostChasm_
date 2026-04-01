@@ -1,27 +1,9 @@
-using Unity.VisualScripting;
 using UnityEngine;
 
-public class CharMovement : MonoBehaviour
+public class BaseCharacterMovement : MovementTypeBase
 {
-    public MovementTypeBase currentMovementType;
-    
-
-
-    public void Start()
-    {
-        currentMovementType = GetComponent<BaseCharacterMovement>();
-    }
-
-    public void Update()
-    {
-
-    }
-
-
-
-    /*
     [Header("Physics References")]
-    
+
     public Rigidbody2D m_rb2D;
     public Collider2D m_collider2D;
 
@@ -43,8 +25,8 @@ public class CharMovement : MonoBehaviour
     public Matrix4x4 transformMatrix;
 
     [SerializeField] private float movement;
-    public float downOffset = 1 ;
-    public float rayDistance  = 20f;
+    public float downOffset = 1;
+    public float rayDistance = 20f;
 
     [SerializeField] private float movementLerpAlpha = 0.2f;
     [SerializeField] private float wallCheckDistance = 2f;
@@ -52,43 +34,36 @@ public class CharMovement : MonoBehaviour
     public void Start()
     {
         movement = 0;
-       
     }
-
-    public void Update()
+    public override void Update()
     {
-        float x = Input.GetAxisRaw("Horizontal");
+        base.Update();
 
+        float x = Input.GetAxisRaw("Horizontal");
         movement = x;
 
-
-        if (Input.GetKeyDown(KeyCode.Space))
-        {
-            Jump();
-        }
-
     }
 
-    public void FixedUpdate()
+    public override void Movement()
     {
         RaycastHit2D middleGroundCast = Physics2D.Raycast((Vector2)transform.position, Vector2.down, rayDistance, groundLayer);
 
-        RaycastHit2D forwardCast = Physics2D.Raycast((Vector2)transform.position , transform.right, wallCheckDistance, wallLayer);
+        RaycastHit2D forwardCast = Physics2D.Raycast((Vector2)transform.position, transform.right, wallCheckDistance, wallLayer);
 
-        RaycastHit2D backwardCast = Physics2D.Raycast((Vector2)transform.position , -transform.right, wallCheckDistance, wallLayer);
+        RaycastHit2D backwardCast = Physics2D.Raycast((Vector2)transform.position, -transform.right, wallCheckDistance, wallLayer);
 
-        if(forwardCast.collider != null)
+        if (forwardCast.collider != null)
         {
             movement = Mathf.Clamp(movement, -1, 0);
-        } 
+        }
         else if (backwardCast.collider != null)
         {
 
             movement = Mathf.Clamp(movement, 1, 0);
         }
-        
+
         Vector2 calcMovement = ((Vector2)transform.right * movement * movementSpeed * Time.fixedDeltaTime) + Vector2.up;
- 
+
         Vector2 LerpedMovement;
 
         LerpedMovement = Vector2.Lerp((Vector2)transform.position, middleGroundCast.point + calcMovement, movementLerpAlpha);
@@ -96,40 +71,31 @@ public class CharMovement : MonoBehaviour
         m_rb2D.MovePosition(LerpedMovement);
         canJump = isGrounded;
     }
-    public void Jump()
-    {
-        if (canJump)
-        {
-            m_rb2D.AddForceY(Mathf.Abs(JumpForce));
-        }
-    }
 
     public void OnDrawGizmos()
     {
         RaycastHit2D hit2D = Physics2D.Raycast((Vector2)transform.position, Vector2.down, rayDistance, groundLayer);
 
-        RaycastHit2D middleGroundCast = Physics2D.Raycast((Vector2)transform.position, Vector2.down, rayDistance, groundLayer);
+      // RaycastHit2D middleGroundCast = Physics2D.Raycast((Vector2)transform.position, Vector2.down, rayDistance, groundLayer);
 
-        RaycastHit2D forwardCast = Physics2D.Raycast((Vector2)transform.position , transform.right, wallCheckDistance , wallLayer);
+        RaycastHit2D forwardCast = Physics2D.Raycast((Vector2)transform.position, transform.right, wallCheckDistance, wallLayer);
 
-        RaycastHit2D backwardCast = Physics2D.Raycast((Vector2)transform.position , -transform.right, wallCheckDistance , wallLayer);
-
-        
+        RaycastHit2D backwardCast = Physics2D.Raycast((Vector2)transform.position, -transform.right, wallCheckDistance, wallLayer);
 
         if (forwardCast.collider != null)
         {
             movement = Mathf.Clamp(movement, -1, 0);
             Gizmos.color = Color.red;
-            Gizmos.DrawWireSphere(forwardCast.point,0.5f);
+            Gizmos.DrawWireSphere(forwardCast.point, 0.5f);
 
 
         }
         else if (backwardCast.collider != null)
         {
 
-             movement = Mathf.Clamp(movement, 1, 0);
-             Gizmos.color = Color.red;
-             Gizmos.DrawWireSphere(backwardCast.point, 0.5f);
+            movement = Mathf.Clamp(movement, 1, 0);
+            Gizmos.color = Color.red;
+            Gizmos.DrawWireSphere(backwardCast.point, 0.5f);
 
         }
 
@@ -137,12 +103,16 @@ public class CharMovement : MonoBehaviour
 
         Gizmos.color = Color.maroon;
         Gizmos.DrawWireSphere(hit2D.point, 0.5f);
-        
-        Gizmos.color = Color.forestGreen;
-        Gizmos.DrawWireSphere(hit2D.point + calcMovement,0.3f);
 
-     
-       
+        Gizmos.color = Color.forestGreen;
+        Gizmos.DrawWireSphere(hit2D.point + calcMovement, 0.3f);
+
+
+
     }
-    */
+
+
+
+
+
 }

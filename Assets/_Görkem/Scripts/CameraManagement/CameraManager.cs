@@ -1,9 +1,75 @@
 using System.Collections;
+using System.Collections.Generic;
 using Unity.Cinemachine;
 using UnityEngine;
 
 public class CameraManager : MonoBehaviour
 {
+    public static Dictionary<string, CinemachineCamera> cameraDictionary = new Dictionary<string, CinemachineCamera>();
+
+
+    public void RegisterCinemachineCamera(string cameraName, CinemachineCamera camera)
+    {
+
+        if(cameraName == string.Empty || camera == null)
+        {
+            Debug.LogWarning("Tried to assign an empty camera name or a null cinemachine Camera reference");
+            return;
+        }
+
+        if (cameraDictionary.ContainsKey(cameraName))
+        {
+            if(cameraDictionary[cameraName] != null)
+            {
+                cameraDictionary[cameraName] = camera;
+                Debug.Log($"Replaced Definition of {cameraName} with {camera.name}");
+            }
+        }
+        else
+        {
+            if (cameraDictionary[cameraName] != null)
+            {
+                cameraDictionary.Add(cameraName, camera);
+            }
+        }
+    }
+    public void UnRegisterCinemachineCamera(string cameraName)
+    {
+
+        if (cameraName == string.Empty )
+        {
+            Debug.LogWarning("Tried to unregister an empty camera name" );
+            return;
+        }
+
+        if (cameraDictionary.ContainsKey(cameraName))
+        {
+            cameraDictionary.Remove(cameraName);
+        }
+        else
+        {
+            Debug.LogWarning("There is no camera registered with that name, make sure you register the camera before");
+            return;
+        }
+       
+    }
+    public CinemachineCamera GetCinemachineCamera(string cameraName)
+    {
+
+       if(cameraDictionary.ContainsKey(cameraName))
+       {
+            return cameraDictionary[cameraName];
+       }
+       else
+       {
+            Debug.LogWarning($"Camera {cameraName} does not exist in list ");
+            return null;
+       }
+
+    }
+
+
+
     /// <summary>
     /// Gets or sets the Cinemachine camera used to render the current room view.
     /// </summary>
@@ -43,7 +109,6 @@ public class CameraManager : MonoBehaviour
         }
 
     }
-
     public void OnEnable()
     {
         CameraEvents.OnSwitchToRoomCamera += CameraEvents_OnSwitchToRoomCamera;
@@ -56,6 +121,10 @@ public class CameraManager : MonoBehaviour
         CameraEvents.OnSwitchToPlayerFollowCamera -= CameraEvents_OnSwitchToPlayerFollowCamera;
     }
 
+
+
+
+
     private void CameraEvents_OnSwitchToPlayerFollowCamera(object sender, System.EventArgs e)
     {
         playerFollowCamera.Priority = 1;
@@ -63,7 +132,6 @@ public class CameraManager : MonoBehaviour
 
         currentCameraBehaviour = CameraBehaviour.PlayerFollowCamera;
     }
-
     private void CameraEvents_OnSwitchToRoomCamera(object sender, RoomBase roomBase)
     {
         if (roomBase == null)

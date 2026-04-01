@@ -19,6 +19,46 @@ public class RoomManager : MonoBehaviour
         RoomEvents.OnSwitchToNewRoom += RoomEvents_OnSwitchToNewRoom;
     }
 
+    private void RoomEvents_OnSwitchToNewRoom(object sender, RoomEvents.OnSwitchedRoomEventArgs switchedNextRoom)
+    {
+        string newRoomName = switchedNextRoom.switchedRoomName;
+
+        RoomBase newRoom  = switchedNextRoom.switchedRoom;
+
+        if (roomMap.ContainsKey(currentRoom.roomName) && currentRoom.roomName != newRoomName)
+        {
+            currentRoom.gameObject.SetActive(false);
+
+            currentRoom = roomMap[newRoomName];
+
+            currentRoom.gameObject.SetActive(true);
+
+            //Teleport the player to the spawnPoint Inside the room (Which is ussually set around the door)
+
+            GameObject playerObj = GameObject.FindGameObjectWithTag("Player");
+            playerObj.transform.position = currentRoom.playerSpawnPoint.position;
+
+            //Telling the Camera Manager to Switch Camera's based on Room Settings
+
+            switch (currentRoom.transitionSettings.baseCameraBehaviour)
+            {
+              case CameraManager.CameraBehaviour.PlayerFollowCamera:
+
+                  CameraEvents.SwitchToPlayerFollowCamera();
+
+                   break;
+
+               case CameraManager.CameraBehaviour.RoomCamera:
+
+                  CameraEvents.SwitchToRoomCamera(currentRoom);
+
+                break;
+
+           }
+
+        }
+    }
+
     public void OnDisable()
     {
         RoomEvents.OnSwitchToNewRoom -= RoomEvents_OnSwitchToNewRoom;
@@ -48,6 +88,8 @@ public class RoomManager : MonoBehaviour
         
 
     }
+
+    /*
     public void SwitchToNewRoom(string newRoom)
     {
         if (roomMap.ContainsKey(currentRoom.roomName) && currentRoom.roomName != newRoom)
@@ -62,7 +104,6 @@ public class RoomManager : MonoBehaviour
 
             //Teleport player to spawn point.
             playerObj.transform.position = currentRoom.playerSpawnPoint.position;
-
 
             switch (currentRoom.transitionSettings.baseCameraBehaviour)
             {
@@ -82,6 +123,7 @@ public class RoomManager : MonoBehaviour
 
         }
     }
+
     private void RoomEvents_OnSwitchToNewRoom(object sender, string newRoomName)
     {
         if (newRoomName == null) return;
@@ -89,6 +131,9 @@ public class RoomManager : MonoBehaviour
         SwitchToNewRoom(newRoomName);
 
     }
+    */
+
+
     public void ReturnToBase()
     {
 
