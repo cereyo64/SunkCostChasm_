@@ -90,7 +90,6 @@ public class Interactor : MonoBehaviour
     
    }
 
-
     private void OnGUI()
     {
         if (!canInteract || sensedInteractable == null) return;
