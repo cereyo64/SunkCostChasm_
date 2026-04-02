@@ -9,3 +9,11 @@ public interface IHaveHealth
 
     public void Dead();
 }
+
+public interface IHaveStamina
+    {
+    public int Stamina { get; set; }
+    public int MaxStamina { get; set; }
+    public void DecraseStamina(int decreaseAmount);
+    public void IncreaseStamina(int increaseAmount);
+}

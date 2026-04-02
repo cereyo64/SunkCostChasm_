@@ -99,7 +99,7 @@ public class BasicPlayerMovement : MonoBehaviour, IHaveHealth
         CurrentHealth = Mathf.Clamp(CurrentHealth, -1, MaxHealth);
 
         if(Input.GetKeyDown(KeyCode.Z)) TakeDamage(10);
-        if (Input.GetKeyDown(KeyCode.X)) Heal(10);
+        if(Input.GetKeyDown(KeyCode.X)) Heal(10);
     }
 
     void FixedUpdate()
@@ -116,6 +116,7 @@ public class BasicPlayerMovement : MonoBehaviour, IHaveHealth
     {
         CurrentHealth -= damageAmount;
         CurrentHealth = Mathf.Clamp(CurrentHealth, -1, MaxHealth);
+        print("Canýmý " + CurrentHealth);
         if (CurrentHealth <= 0) Dead();
     }
 
@@ -124,6 +125,7 @@ public class BasicPlayerMovement : MonoBehaviour, IHaveHealth
         if (CurrentHealth >= MaxHealth) return;
         CurrentHealth += healAmount;
         CurrentHealth = Mathf.Clamp(CurrentHealth, -1, MaxHealth);
+        print("Canýmý " + CurrentHealth);
     }
 
     public void Dead()

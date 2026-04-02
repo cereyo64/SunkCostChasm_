@@ -8,6 +8,7 @@ public class InteractableObject : ScriptableObject, IInteractable
     [Header("Object Basics")]
     public string ObjectName;
     public ItemBehavior InteractType;
+    public bool EtkileþimBitinceYokOl;
     public enum ItemBehavior
     {
         // 2. Seçenekler: Buraya yazdýðýn her kelime, Inspector panelinde bir seçenek olur.
@@ -17,7 +18,6 @@ public class InteractableObject : ScriptableObject, IInteractable
         SürekliEtkileþim,
         SürekliEtkileþimBitince,
     }
-    public string canInteractedByTag = "Player";
 
     [Header("Obje Views")]
     public Sprite ObjectSprite;
