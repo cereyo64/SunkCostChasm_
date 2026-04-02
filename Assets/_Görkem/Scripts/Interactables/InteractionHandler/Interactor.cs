@@ -30,7 +30,7 @@ public class Interactor : MonoBehaviour
 
             sensedInteractable = interactable;
 
-            Debug.Log($"Currently sensed the {interactable.InteractionName}");
+            
         }
 
    }
@@ -41,7 +41,6 @@ public class Interactor : MonoBehaviour
         {
           sensedInteractable = null;
 
-          Debug.Log($"No longer sensed the {interactable.InteractionName}");
 
         }
     }
@@ -51,17 +50,17 @@ public class Interactor : MonoBehaviour
         
         if (sensedInteractable == null) return;
 
-        if (Input.GetKeyDown(KeyCode.O))
+        if (Input.GetKeyDown(KeyCode.Return ) || Input.GetKeyDown(KeyCode.O))
         {
             if(currentHeldItem != "")
             {
                 sensedInteractable.InteractWithItem(currentHeldItem);
-                Debug.LogWarning("Interacted With item!");
+                //Debug.LogWarning("Interacted With item!");
             }
             else
             {
                 sensedInteractable.Interact();
-                Debug.LogWarning("Interacted Without item");
+                //Debug.LogWarning("Interacted Without item");
             }
             
         }

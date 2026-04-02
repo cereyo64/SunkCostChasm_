@@ -18,15 +18,22 @@ public class RoomManager : MonoBehaviour
     {
         RoomEvents.OnSwitchToNewRoom += RoomEvents_OnSwitchToNewRoom;
     }
-
+    public void OnDisable()
+    {
+        RoomEvents.OnSwitchToNewRoom -= RoomEvents_OnSwitchToNewRoom;
+    }
+    
     private void RoomEvents_OnSwitchToNewRoom(object sender, RoomEvents.OnSwitchedRoomEventArgs switchedNextRoom)
     {
         string newRoomName = switchedNextRoom.switchedRoomName;
 
-        RoomBase newRoom  = switchedNextRoom.switchedRoom;
+         
+          if (roomMap.ContainsKey(newRoomName))
+          {
+            currentRoom = roomMap[newRoomName];
+          }
 
-        if (roomMap.ContainsKey(currentRoom.roomName) && currentRoom.roomName != newRoomName)
-        {
+      
             currentRoom.gameObject.SetActive(false);
 
             currentRoom = roomMap[newRoomName];
@@ -44,9 +51,9 @@ public class RoomManager : MonoBehaviour
             {
               case CameraManager.CameraBehaviour.PlayerFollowCamera:
 
-                  CameraEvents.SwitchToPlayerFollowCamera();
+                CameraEvents.SwitchToPlayerFollowCamera();
 
-                   break;
+                break;
 
                case CameraManager.CameraBehaviour.RoomCamera:
 
@@ -54,14 +61,9 @@ public class RoomManager : MonoBehaviour
 
                 break;
 
-           }
+           
 
         }
-    }
-
-    public void OnDisable()
-    {
-        RoomEvents.OnSwitchToNewRoom -= RoomEvents_OnSwitchToNewRoom;
     }
 
     public void Start() 

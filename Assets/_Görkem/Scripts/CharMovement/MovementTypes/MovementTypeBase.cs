@@ -2,10 +2,10 @@ using UnityEngine;
 
 public class MovementTypeBase : MonoBehaviour 
 {
-
+    public string movementName;
     public Rigidbody2D rb2D;
 
-    public virtual void EnterMovement(Rigidbody2D rigidBody2D)
+    public virtual void EnterMovement(Rigidbody2D rigidBody2D,Collider2D collider2D)
     {
         if(rb2D != null)
         {
@@ -18,20 +18,17 @@ public class MovementTypeBase : MonoBehaviour
 
     }
 
-    public virtual void ExitMovement(Rigidbody2D rigidBody2D)
+    public virtual void Initilize()
     {
-        if (rb2D != null)
-        {
-            rb2D = rigidBody2D;
-        }
-        else
-        {
-            Debug.LogError("You assigned A null rigidbody");
-        }
+
+    }
+    public virtual void ExitMovement()
+    {
+        Debug.Log("Exited this movementType");
 
     }
 
-    public virtual void Update()
+    public virtual void UpdateCache()
     {
 
     }
@@ -42,6 +39,10 @@ public class MovementTypeBase : MonoBehaviour
     }
 
 
-
+    public string GetMovementName()
+    {
+        return movementName;
+    }
+    
 
 }

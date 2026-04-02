@@ -1,23 +1,53 @@
+using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
 
 public class CharMovement : MonoBehaviour
 {
-    public MovementTypeBase currentMovementType;
-    
+    public Rigidbody2D rb2D;
+    public Collider2D col2D;
 
+    
+    public Dictionary<string,MovementTypeBase> movementTypes = new Dictionary<string,MovementTypeBase>();
+
+    public MovementTypeBase currentMovementType;
 
     public void Start()
     {
+        if(rb2D == null)
+        {
+            rb2D = GetComponent<Rigidbody2D>();
+        }
+
+        if(col2D == null)
+        {
+            col2D = GetComponent<Collider2D>();
+        }
         currentMovementType = GetComponent<BaseCharacterMovement>();
+        currentMovementType.EnterMovement(rb2D,col2D);
     }
 
     public void Update()
     {
+        currentMovementType.UpdateCache();
+    }
 
+    public void FixedUpdate()
+    {
+        currentMovementType.Movement();
     }
 
 
+    public void RegisterNewMovementType(string movementName, MovementTypeBase newMovement)
+    {
+
+    }
+    public void SwitchToNewMovementType(string movementName)
+    {
+
+        currentMovementType.ExitMovement();
+
+    }
 
     /*
     [Header("Physics References")]

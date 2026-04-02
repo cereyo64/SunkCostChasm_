@@ -211,7 +211,7 @@ Transform:
   - {fileID: 1146001904}
   - {fileID: 1074936743}
   - {fileID: 599321675}
-  - {fileID: 632556633}
+  - {fileID: 878480744}
   - {fileID: 2037237604}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -230,7 +230,7 @@ MonoBehaviour:
   roomName: NewRoomDawg
   playerSpawnPoint: {fileID: 2037237604}
   transitionSettings:
-    roomCameraOffset: {x: 6, y: 4.9, z: -15}
+    roomCameraOffset: {x: 20, y: 4.9, z: -15}
     transitionTime: 2
     baseCameraBehaviour: 1
 --- !u!213 &148308977
@@ -6576,7 +6576,7 @@ Transform:
   m_LocalScale: {x: 0.46728, y: 0.46728, z: 2.3364}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 116541210}
+  m_Father: {fileID: 878480744}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &632556634
 SpriteRenderer:
@@ -28774,6 +28774,39 @@ Tilemap:
     e31: 0
     e32: 0
     e33: 1
+--- !u!1 &878480743
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 878480744}
+  m_Layer: 0
+  m_Name: Interactables
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &878480744
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 878480743}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 632556633}
+  - {fileID: 1670012286}
+  m_Father: {fileID: 116541210}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!213 &1018129526
 Sprite:
   m_ObjectHideFlags: 0
@@ -46011,8 +46044,8 @@ Transform:
   - {fileID: 1529811831}
   - {fileID: 541497429}
   - {fileID: 1372248721}
-  - {fileID: 1538975362}
   - {fileID: 1450850050}
+  - {fileID: 1538975362}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1264977799
@@ -47052,7 +47085,8 @@ GameObject:
   - component: {fileID: 1377167661}
   - component: {fileID: 1377167662}
   - component: {fileID: 1377167663}
-  m_Layer: 0
+  - component: {fileID: 1377167664}
+  m_Layer: 8
   m_Name: PlayerCharacter
   m_TagString: Player
   m_Icon: {fileID: 0}
@@ -47154,11 +47188,28 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1e5d3016fff57c44eba2b69b03a2b2f2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CharMovement
-  m_rb2D: {fileID: 1377167662}
-  m_collider2D: {fileID: 1377167661}
-  movementSpeed: 30
+  rb2D: {fileID: 1377167662}
+  col2D: {fileID: 1377167661}
+  currentMovementType: {fileID: 1377167664}
+--- !u!114 &1377167664
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1377167659}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7ddf1621ac8bbfe4d96be9970bd01a04, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::BaseCharacterMovement
+  movementName: BaseMovement
+  rb2D: {fileID: 0}
+  m_rb2D: {fileID: 0}
+  m_collider2D: {fileID: 0}
+  movementSpeed: 80
   isGrounded: 0
-  groundCheckRadius: 0.2
+  groundCheckRadius: 0.5
   groundLayer:
     serializedVersion: 2
     m_Bits: 128
@@ -47167,7 +47218,7 @@ MonoBehaviour:
     m_Bits: 8
   lastCachedPosition: {x: 0, y: 0}
   canJump: 0
-  JumpForce: 400
+  JumpForce: 0
   transformMatrix:
     e00: 0
     e01: 0
@@ -47277,6 +47328,7 @@ GameObject:
   - component: {fileID: 1450850052}
   - component: {fileID: 1450850051}
   - component: {fileID: 1450850049}
+  - component: {fileID: 1450850053}
   m_Layer: 6
   m_Name: Door
   m_TagString: Untagged
@@ -47420,6 +47472,33 @@ MonoBehaviour:
   leadingRoom: NewRoomDawg
   requiredItemName: 
   canInteract: 1
+--- !u!50 &1450850053
+Rigidbody2D:
+  serializedVersion: 5
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1450850048}
+  m_BodyType: 1
+  m_Simulated: 1
+  m_UseFullKinematicContacts: 0
+  m_UseAutoMass: 0
+  m_Mass: 1
+  m_LinearDamping: 0
+  m_AngularDamping: 0.05
+  m_GravityScale: 1
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_Interpolate: 0
+  m_SleepingMode: 1
+  m_CollisionDetection: 0
+  m_Constraints: 0
 --- !u!213 &1526147093
 Sprite:
   m_ObjectHideFlags: 0
@@ -49073,6 +49152,105 @@ Sprite:
   m_Bones: []
   m_ScriptableObjects: []
   m_SpriteID: 
+--- !u!1 &1670012285
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1670012286}
+  - component: {fileID: 1670012287}
+  - component: {fileID: 1670012288}
+  m_Layer: 0
+  m_Name: CameraModifyTrigger
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1670012286
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1670012285}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 7.75, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 878480744}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1670012287
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1670012285}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 86524fc17ab036b47bc109b2ef716a95, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CameraBehaviourSwitch
+  collision2D: {fileID: 1670012288}
+  interactedLayers:
+    serializedVersion: 2
+    m_Bits: 256
+  modifyBehaviour: 0
+  isOneTimed: 0
+  isFired: 0
+  isSwitcher: 1
+--- !u!61 &1670012288
+BoxCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1670012285}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_ForceSendLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ForceReceiveLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ContactCaptureLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_CallbackLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_IsTrigger: 1
+  m_UsedByEffector: 0
+  m_CompositeOperation: 0
+  m_CompositeOrder: 0
+  m_Offset: {x: 0, y: 0}
+  m_SpriteTilingProperty:
+    border: {x: 0, y: 0, z: 0, w: 0}
+    pivot: {x: 0, y: 0}
+    oldSize: {x: 0, y: 0}
+    newSize: {x: 0, y: 0}
+    adaptiveTilingThreshold: 0
+    drawMode: 0
+    adaptiveTiling: 0
+  m_AutoTiling: 0
+  m_Size: {x: 2, y: 25}
+  m_EdgeRadius: 0
 --- !u!1 &1679800022
 GameObject:
   m_ObjectHideFlags: 0

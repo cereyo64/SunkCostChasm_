@@ -12,6 +12,12 @@ public class CameraEvents
 
     public static event EventHandler<bool> OnFollowCameraToggle;
 
+    public static event EventHandler OnSwitchToCurrentRoomCamera;
+
+    public static void SwitchToCurrentRoomCamera()
+    {
+        OnSwitchToCurrentRoomCamera?.Invoke(null, EventArgs.Empty);
+    }
     public static void SwitchToRoomCamera(RoomBase currentRoom)
     {
         OnSwitchToRoomCamera?.Invoke(null , currentRoom );

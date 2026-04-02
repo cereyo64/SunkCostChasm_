@@ -6,8 +6,6 @@ using UnityEngine;
 public class CameraManager : MonoBehaviour
 {
     public static Dictionary<string, CinemachineCamera> cameraDictionary = new Dictionary<string, CinemachineCamera>();
-
-
     public void RegisterCinemachineCamera(string cameraName, CinemachineCamera camera)
     {
 
@@ -113,17 +111,23 @@ public class CameraManager : MonoBehaviour
     {
         CameraEvents.OnSwitchToRoomCamera += CameraEvents_OnSwitchToRoomCamera;
         CameraEvents.OnSwitchToPlayerFollowCamera += CameraEvents_OnSwitchToPlayerFollowCamera;
+
+        CameraEvents.OnSwitchToCurrentRoomCamera += CameraEvents_OnSwitchToCurrentRoomCamera;
+    }
+
+    private void CameraEvents_OnSwitchToCurrentRoomCamera(object sender, System.EventArgs e)
+    {
+        roomCamera.Priority = 1;
+        playerFollowCamera.Priority = 0;
+        currentCameraBehaviour = CameraBehaviour.RoomCamera;
     }
 
     public void OnDisable()
     {
         CameraEvents.OnSwitchToRoomCamera -= CameraEvents_OnSwitchToRoomCamera;
         CameraEvents.OnSwitchToPlayerFollowCamera -= CameraEvents_OnSwitchToPlayerFollowCamera;
+        CameraEvents.OnSwitchToCurrentRoomCamera -= CameraEvents_OnSwitchToCurrentRoomCamera;
     }
-
-
-
-
 
     private void CameraEvents_OnSwitchToPlayerFollowCamera(object sender, System.EventArgs e)
     {
@@ -136,7 +140,7 @@ public class CameraManager : MonoBehaviour
     {
         if (roomBase == null)
         {
-            Debug.LogWarning("The room reference sent into ther Camera Event is null ");
+            Debug.LogWarning("The room reference sent into their Camera Event is null ");
             return;
         }
 

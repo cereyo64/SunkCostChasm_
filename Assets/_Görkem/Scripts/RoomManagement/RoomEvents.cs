@@ -4,9 +4,9 @@ using UnityEngine;
 public class RoomEvents
 {
     public static event EventHandler<OnSwitchedRoomEventArgs> OnSwitchToNewRoom;
-    public static void SwitchToNewRoom(string SwitchedRoomName, RoomBase switchedRoom)
+    public static void SwitchToNewRoom(string SwitchedRoomName)
     {
-        OnSwitchToNewRoom?.Invoke(null, new OnSwitchedRoomEventArgs {switchedRoomName = SwitchedRoomName, switchedRoom = switchedRoom });
+        OnSwitchToNewRoom?.Invoke(null, new OnSwitchedRoomEventArgs {switchedRoomName = SwitchedRoomName});
     }
 
     public class OnSwitchedRoomEventArgs : EventArgs

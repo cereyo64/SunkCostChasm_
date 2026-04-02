@@ -35,10 +35,20 @@ public class BaseCharacterMovement : MovementTypeBase
     {
         movement = 0;
     }
-    public override void Update()
-    {
-        base.Update();
 
+    public override void EnterMovement(Rigidbody2D rigidBody2D, Collider2D collider2D)
+    {
+
+        if(rigidBody2D == null || collider2D == null)
+        {
+            Debug.LogError("The Rigidbody or Collider reference you tried to assign is null");
+        }
+        m_rb2D = rigidBody2D;
+        m_collider2D = collider2D;
+    }
+    public override void UpdateCache()
+    {
+       
         float x = Input.GetAxisRaw("Horizontal");
         movement = x;
 
