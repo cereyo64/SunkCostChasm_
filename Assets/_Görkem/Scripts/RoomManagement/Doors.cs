@@ -12,6 +12,11 @@ public class Doors : MonoBehaviour, IInteractable
     public bool KeyRequired;
     public bool DestroyKeyOnUse;
 
+    [Header("Oda deðiþtiriyor mu ?")]
+    public Sprite RoomChangerDoorSprite;
+    public Sprite NormalDoorSprite;
+    public bool IsRoomChangerDoor;
+    public Color AfterOpenedDoorColor;
 
     public string RequiredItemName { get => requiredItemName ; set => requiredItemName = value; }
     public bool CanInteract { get => canInteract ; set => canInteract = value; }
@@ -52,7 +57,12 @@ public class Doors : MonoBehaviour, IInteractable
             {
                 SendPlayerToNextRoom();
                 KeyRequired = false;
-                if(DestroyKeyOnUse) PlayerInventory.Inventory.Keys.Remove(itemName);
+                if (DestroyKeyOnUse)
+                {
+                    PlayerInventory.Inventory.Keys.Remove(itemName);
+                    //Ses efekti kullanýlacaksa burada çalýnabilir.
+                }
+
             }
             else
             {
@@ -64,10 +74,21 @@ public class Doors : MonoBehaviour, IInteractable
     }
     public void SendPlayerToNextRoom()
     {
+        if (IsRoomChangerDoor)
+        {
+            RoomEvents.SwitchToNewRoom(leadingRoom);
 
-        RoomEvents.SwitchToNewRoom(leadingRoom);
+            Debug.Log($"Player travels to {leadingRoom}");
+        }
+        else
+        {
+            GetComponent<BoxCollider2D>().isTrigger = true;
+            CanInteract = false;
+            GetComponent<SpriteRenderer>().sortingOrder = 3;
+            GetComponent<SpriteRenderer>().color = AfterOpenedDoorColor;
+            //Kapý açýlma sesi konulabilir.
+        }
         
-        Debug.Log($"Player travels to {leadingRoom}");
     }
 
     public void Start()
@@ -80,6 +101,17 @@ public class Doors : MonoBehaviour, IInteractable
         else
         {
             KeyRequired = true;
+        }
+
+        if(IsRoomChangerDoor)
+        {
+            GetComponent<SpriteRenderer>().sprite = RoomChangerDoorSprite;
+            GetComponent<BoxCollider2D>().isTrigger = true;
+        }
+        else
+        {
+            GetComponent<SpriteRenderer>().sprite = NormalDoorSprite;
+            GetComponent<BoxCollider2D>().isTrigger = false;
         }
     }
 }
