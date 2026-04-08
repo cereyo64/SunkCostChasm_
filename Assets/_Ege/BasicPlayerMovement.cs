@@ -313,6 +313,7 @@ public class BasicPlayerMovement : MonoBehaviour, IHaveHealth
     {
         ladderElapsedTime = 0;
         canMove = false;
+        rb.linearVelocity = Vector3.zero;
         rb.bodyType = RigidbodyType2D.Kinematic;
         col.enabled = false;
 
@@ -356,7 +357,7 @@ public class BasicPlayerMovement : MonoBehaviour, IHaveHealth
     }
     private IEnumerator ExitLadder()
     {
-        
+        rb.linearVelocity = Vector3.zero;
         rb.bodyType = RigidbodyType2D.Dynamic;
         col.enabled = true;
         canMove = true;
