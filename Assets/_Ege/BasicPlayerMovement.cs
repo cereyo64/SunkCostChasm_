@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using UnityEngine;
 
@@ -23,13 +24,15 @@ public class BasicPlayerMovement : MonoBehaviour, IHaveHealth
     public float StaminaDecraseRate;
 
     [Header("Hareket Durumu ")]
+    [SerializeField] private Collider2D col;
     private Rigidbody2D rb;
     private bool isGrounded;
     private float moveInput;
+    [SerializeField] private bool canMove = true;
 
     public MovementType currentMoveType = MovementType.Walking;
     public Ladder grabbedLadder;
-    public float climbingSpeed;
+    public float ladderElapsedTime = 0;
 
     [Header("Görünüþ Ayarlarý")]
 
@@ -70,7 +73,7 @@ public class BasicPlayerMovement : MonoBehaviour, IHaveHealth
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
-
+        col = GetComponent<Collider2D>();
         // Havada dönmeyi engellemek için rotasyonu kilitler
         rb.constraints = RigidbodyConstraints2D.FreezeRotation;
         MoveSpeed = walkSpeed;
@@ -80,6 +83,7 @@ public class BasicPlayerMovement : MonoBehaviour, IHaveHealth
         isRightSide = true;
         
     }
+
     public void OnEnable()
     {
         MovementEvents.OnGrabLadder += MovementEvents_OnGrabLadder;
@@ -108,56 +112,26 @@ public class BasicPlayerMovement : MonoBehaviour, IHaveHealth
     #region Update ve FixedUpdate
     void Update()
     {
-        // 1. Zemin kontrolü ve Input alýmý
-        isGrounded = Physics2D.OverlapCircle(groundCheck.position, checkRadius, groundLayer);
-        moveInput = Input.GetAxisRaw("Horizontal");
-
-        // 2. Zýplama Kontrolü
-        if (Input.GetKeyDown(KeyCode.Space) && isGrounded)
+        switch (currentMoveType)
         {
-            rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpForce);
+            case MovementType.Walking:
+                WalkingUpdate();
+            break;
+
+            case MovementType.Sprinting:
+                SprintingUpdate();
+            break;
+
+            case MovementType.Ladder:
+                LadderUpdate();
+            break;
+
+            case MovementType.Stunned:
+
+            break;
         }
 
-        // 3. KOÞMA MANTIÐI (Update içinde karar veriyoruz)
-        // Shift'e basýlýyorsa, stamina bitmemiþse ve hareket ediyorsa koþ
-        if (Input.GetKey(KeyCode.LeftShift) && !StaminaIsFinished && Mathf.Abs(moveInput) > 0.1f)
-        {
-            IsRunning = true;
-            MoveSpeed = runSpeed;
-        }
-        else
-        {
-            IsRunning = false;
-            MoveSpeed = walkSpeed;
-        }
-
-        // 4. STAMINA YÖNETÝMÝ
-        if (IsRunning)
-        {
-            // Stamina tüketimi
-            Stamina -= StaminaDecraseRate * Time.deltaTime;
-            if (Stamina <= 0) // 0'ýn altýna düþmesine izin verme
-            {
-                Stamina = 0;
-                StaminaIsFinished = true;
-            }
-        }
-        else
-        {
-            // Stamina dolumu (Koþmadýðý her an dolmalý)
-            if (Stamina < MaxStamina)
-            {
-                Stamina += StaminaIncraseRate * Time.deltaTime;
-            }
-
-            // Stamina belli bir eþiði geçince tekrar koþmaya izin ver (Örn: %20 dolunca)
-            if (Stamina >= (MaxStamina * 0.2f))
-            {
-                StaminaIsFinished = false;
-            }
-        }
-
-        // Deðeri her zaman 0 ile MaxStamina arasýnda tut (Clamp)
+       
         Stamina = Mathf.Clamp(Stamina, 0, MaxStamina);
         CurrentHealth = Mathf.Clamp(CurrentHealth, -1, MaxHealth);
 
@@ -169,13 +143,38 @@ public class BasicPlayerMovement : MonoBehaviour, IHaveHealth
     }
     void FixedUpdate()
     {
-        // Hareket uygulama
-        rb.linearVelocity = new Vector2(moveInput * MoveSpeed, rb.linearVelocity.y);
 
-        // Karakterin yönünü çevirme (Flip)
-        if(moveInput > 0)
+      
+
+        switch (currentMoveType)
         {
-            foreach(Transform t in flippableVisuals)
+            case MovementType.Walking:
+                WalkingFixedUpdate();
+                break;
+
+            case MovementType.Sprinting:
+                SprintingFixedUpdate();
+                break;
+
+            case MovementType.Ladder:
+                LadderFixedUpdate();
+                break;
+
+            case MovementType.Stunned:
+
+            break;
+        }
+
+
+        HandleFlipping();
+
+    }
+
+    private void HandleFlipping()
+    {
+        if (moveInput > 0)
+        {
+            foreach (Transform t in flippableVisuals)
             {
                 t.rotation = Quaternion.Euler(t.rotation.x, 0, t.rotation.z);
             }
@@ -187,13 +186,9 @@ public class BasicPlayerMovement : MonoBehaviour, IHaveHealth
                 t.rotation = Quaternion.Euler(t.rotation.x, -180, t.rotation.z);
                 lightTransform.Rotate(Vector3.forward, -lightSwitchTime * Mathf.Deg2Rad);
 
-                
+
             }
         }
-
-        //if (moveInput > 0) transform.localScale = new Vector3(1, 1, 1);
-        //else if (moveInput < 0) transform.localScale = new Vector3(-1, 1, 1);
-
     }
 
     #endregion
@@ -242,6 +237,8 @@ public class BasicPlayerMovement : MonoBehaviour, IHaveHealth
             SwitchMovementTypes(MovementType.Sprinting);
         }
 
+        HandleFlipping();
+
     }
     public void SprintingUpdate()
     {
@@ -263,6 +260,125 @@ public class BasicPlayerMovement : MonoBehaviour, IHaveHealth
             SwitchMovementTypes(MovementType.Walking);
             IsRunning = false;
             MoveSpeed = walkSpeed;
+        }
+
+       
+        
+
+        HandleFlipping();
+
+    }
+    public void LadderUpdate()
+    {
+        
+        moveInput = Input.GetAxisRaw("Vertical");
+
+        //isGrounded = Physics2D.OverlapCircle(groundCheck.position, checkRadius, groundLayer);
+    }
+
+     //Hareket Durumunu Deðiþtirir , deðiþen duruma göre anlýk deðiþimler yapar.
+    #endregion
+
+    //Hareket Durumuna Tepki veren Fonksiyonlar
+    public void SwitchMovementTypes(MovementType newType)
+    {
+        if (newType == currentMoveType) return;
+
+        switch (newType)
+        {
+            case MovementType.Sprinting:
+
+                IsRunning = true;
+                MoveSpeed = runSpeed;
+
+            break;
+
+
+            case MovementType.Walking:
+
+            break;
+
+            case MovementType.Ladder:
+
+               StartCoroutine(EnterLadder());
+
+            break;
+
+        }
+
+        currentMoveType = newType;
+
+    }
+    private IEnumerator EnterLadder()
+    {
+        ladderElapsedTime = 0;
+        canMove = false;
+        rb.bodyType = RigidbodyType2D.Kinematic;
+        col.enabled = false;
+
+        Debug.Log("EnteredLadder");
+
+        if(grabbedLadder == null)
+        {
+            Debug.Log("Aint no Ladder Found to enter ");
+
+            SwitchMovementTypes(MovementType.Walking);
+            yield break;
+        }
+
+        float distToAPoint = Vector3.Distance(transform.position,grabbedLadder.PointA.position);
+        float distToBPoint = Vector3.Distance(transform.position,grabbedLadder.PointB.position);
+        float progressTime = 0;
+
+        if(distToAPoint > distToBPoint)
+        {
+            progressTime =  grabbedLadder.climbTime * 0.9f ;
+            ladderElapsedTime = progressTime;
+            //B noktasýna daha yakýnsa , oyuncuyu, merdivende , %90 ilerleme (B'ye yakýn) bir noktaya ata.
+            Vector3 progressPoint = Vector3.Lerp(grabbedLadder.PointA.position, grabbedLadder.PointB.position, Mathf.Clamp01(grabbedLadder.climbTime * 0.9f / grabbedLadder.climbTime));
+            rb.MovePosition(progressPoint);
+            canMove = true;
+            yield break;
+        }
+        if ( distToBPoint > distToAPoint )
+        {
+            progressTime = grabbedLadder.climbTime * 0.1f ;
+            ladderElapsedTime = progressTime;
+            //A noktasýna daha yakýnsa , oyuncuyu, merdivende , %10 ilerleme (A'ya yakýn) bir noktaya ata.
+            Vector3 progressPoint = Vector3.Lerp(grabbedLadder.PointA.position, grabbedLadder.PointB.position, Mathf.Clamp01(grabbedLadder.climbTime * 0.1f / grabbedLadder.climbTime));
+            canMove = true;
+           
+            rb.MovePosition(progressPoint);
+            yield break;
+        }
+       
+        
+    }
+    private IEnumerator ExitLadder()
+    {
+        
+        rb.bodyType = RigidbodyType2D.Dynamic;
+        col.enabled = true;
+        canMove = true;
+        SwitchMovementTypes(MovementType.Walking);
+        Debug.Log("Exited Ladder");
+        yield return null;
+
+    }
+
+    #region Hareket Durumu FixedUpdate Fonksiyonlarý
+    public void WalkingFixedUpdate()
+    {
+        if (canMove)
+        {
+            rb.linearVelocity = new Vector2(moveInput * MoveSpeed, rb.linearVelocity.y);
+        }
+    }
+    public void SprintingFixedUpdate()
+    {
+        if (canMove)
+        {
+            rb.linearVelocity = new Vector2(moveInput * MoveSpeed, rb.linearVelocity.y);
         }
 
         // 4. STAMINA YÖNETÝMÝ
@@ -290,62 +406,43 @@ public class BasicPlayerMovement : MonoBehaviour, IHaveHealth
                 StaminaIsFinished = false;
             }
         }
-
-    }
-    public void LadderUpdate()
-    {
-        //Üst ve Aþaðý hareketi algýlar
-        moveInput = Input.GetAxisRaw("Vertical");
-        isGrounded = Physics2D.OverlapCircle(groundCheck.position, checkRadius, groundLayer);
-    }
-
-
-     //Hareket Durumunu Deðiþtirir , deðiþen duruma göre anlýk deðiþimler yapar.
-    public void SwitchMovementTypes(MovementType newType)
-    {
-        if (newType == currentMoveType) return;
-
-        switch (newType)
-        {
-            case MovementType.Sprinting:
-
-                IsRunning = true;
-                MoveSpeed = runSpeed;
-
-            break;
-
-
-            case MovementType.Walking:
-
-            break;
-
-            case MovementType.Ladder:
-
-
-
-            break;
-
-        }
-
-        currentMoveType = newType;
-
-    }
-
-    #endregion
-
-    public void MovementFixedUpdate()
-    {
-
-    }
-
-    public void SprintingFixedUpdate()
-    {
-
     }
     public void LadderFixedUpdate()
     {
+        if(ladderElapsedTime > grabbedLadder.climbTime || ladderElapsedTime < 0)
+        {
+            StartCoroutine(ExitLadder());
+            return;
+            
+        }
+        
+        if(moveInput < 0)
+        {
+            ladderElapsedTime += Time.deltaTime;
+
+            float t = Mathf.Clamp01(ladderElapsedTime / grabbedLadder.climbTime);
+
+            Vector3 progressPoint = Vector3.Lerp(grabbedLadder.PointA.position, grabbedLadder.PointB.position, t);
+            rb.MovePosition(progressPoint);
+
+        }
+
+        if(moveInput > 0)
+        {
+            ladderElapsedTime -= Time.deltaTime;
+
+            float t = Mathf.Clamp01(ladderElapsedTime / grabbedLadder.climbTime);
+
+            Vector3 progressPoint = Vector3.Lerp(grabbedLadder.PointA.position, grabbedLadder.PointB.position, t);
+            rb.MovePosition(progressPoint);
+        }
+
+        
+
+
 
     }
+    #endregion
 
     //Zaman içerisinde ýþýðýn saðdaysa sola, soldaysa saða geçmesini saðlar
     public IEnumerator SwitchLightDirection(int direction)

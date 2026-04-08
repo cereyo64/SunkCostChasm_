@@ -46,6 +46,10 @@ public class MonsterBase : MonoBehaviour
         currentMovementState = MovementState.Idle;
         Invoke("FindRandomMovePoint", 0.3f);
 
+        if (timerStarted)
+        {
+
+        }
     }
     public void Update()
     {

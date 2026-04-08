@@ -15,7 +15,7 @@ public class Ladder : MonoBehaviour , IInteractable
 
     public float progressBetweenPoints = 0;
 
-    public float totalTravelTime = 4f;
+    public float climbTime = 4f;
 
     public string InteractionName { get => interactionName ; set => interactionName = value; }
     public string RequiredItemName { get => throw new System.NotImplementedException(); set => throw new System.NotImplementedException(); }
