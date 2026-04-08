@@ -1,3 +1,4 @@
+using JetBrains.Annotations;
 using System;
 using UnityEngine;
 
@@ -17,6 +18,14 @@ public class Doors : MonoBehaviour, IInteractable
     public Sprite NormalDoorSprite;
     public bool IsRoomChangerDoor;
     public Color AfterOpenedDoorColor;
+    public Color AfterClosedDoorColor;
+
+    [Header("Jeneratör baðlantýsý")]
+    public string ConnectedGeneratorName;
+    public bool ThisDoorIsReversedDoorForGenerator; // Eðer bu kapý jeneratörle baðlantýlýysa ve jeneratör kapalýyken açýk, jeneratör açýlýnca kapanacaksa true yap
+    [HideInInspector] public bool IsConnectedToGenerator;
+    public bool DoorIsOpened;
+
 
     public string RequiredItemName { get => requiredItemName ; set => requiredItemName = value; }
     public bool CanInteract { get => canInteract ; set => canInteract = value; }
@@ -30,11 +39,22 @@ public class Doors : MonoBehaviour, IInteractable
         {
             InteractWithItem(requiredItemName);
         }
+        else if (IsConnectedToGenerator)
+        {
+            // Jeneratör açýksa geç, kapalýysa mesaj ver
+            if (DoorIsOpened)
+            {
+                SendPlayerToNextRoom();
+            }
+            else
+            {
+                print("Bu kapý bir jeneratöre baðlý, önce jeneratörü aç!");
+            }
+        }
         else
         {
             SendPlayerToNextRoom();
         }
-        
     }
     public void InteractCancel()
     {
@@ -48,7 +68,6 @@ public class Doors : MonoBehaviour, IInteractable
     {
         
     }
-
     public void InteractWithItem(string itemName)
     {
         if (KeyRequired)
@@ -60,18 +79,21 @@ public class Doors : MonoBehaviour, IInteractable
                 if (DestroyKeyOnUse)
                 {
                     PlayerInventory.Inventory.Keys.Remove(itemName);
-                    //Ses efekti kullanýlacaksa burada çalýnabilir.
                 }
-
             }
             else
             {
                 print("You need the correct key to open this door.");
             }
         }
-        
-       
+        else
+        {
+            print("This door doesn't require a key or Generator Connections");
+        }
     }
+
+
+
     public void SendPlayerToNextRoom()
     {
         if (IsRoomChangerDoor)
@@ -82,18 +104,28 @@ public class Doors : MonoBehaviour, IInteractable
         }
         else
         {
-            GetComponent<BoxCollider2D>().isTrigger = true;
-            CanInteract = false;
-            GetComponent<SpriteRenderer>().sortingOrder = 3;
-            GetComponent<SpriteRenderer>().color = AfterOpenedDoorColor;
-            //Kapý açýlma sesi konulabilir.
+            OpenedDoor();
         }
         
     }
 
+    public void OpenedDoor()
+    {
+        GetComponent<BoxCollider2D>().isTrigger = true;
+        GetComponent<SpriteRenderer>().color = AfterOpenedDoorColor;
+        DoorIsOpened = true;
+    }
+
+    public void ClosedDoor()
+    {
+        GetComponent<BoxCollider2D>().isTrigger = false;
+        GetComponent<SpriteRenderer>().color = AfterClosedDoorColor;
+        DoorIsOpened = false;
+    }
+
     public void Start()
     {
-        if(requiredItemName == "")
+        if (requiredItemName == "")
         {
             KeyRequired = false;
             DestroyKeyOnUse = false;
@@ -103,7 +135,7 @@ public class Doors : MonoBehaviour, IInteractable
             KeyRequired = true;
         }
 
-        if(IsRoomChangerDoor)
+        if (IsRoomChangerDoor)
         {
             GetComponent<SpriteRenderer>().sprite = RoomChangerDoorSprite;
             GetComponent<BoxCollider2D>().isTrigger = true;
@@ -112,6 +144,33 @@ public class Doors : MonoBehaviour, IInteractable
         {
             GetComponent<SpriteRenderer>().sprite = NormalDoorSprite;
             GetComponent<BoxCollider2D>().isTrigger = false;
+        }
+
+        if (!DoorIsOpened)
+        {
+            ClosedDoor();
+        }
+        else
+        {
+            OpenedDoor();
+        }
+
+        if (ConnectedGeneratorName == "")
+        {
+            IsConnectedToGenerator = false;
+        }
+        else
+        {
+            IsConnectedToGenerator = true;
+            RequiredItemName = ConnectedGeneratorName;
+            KeyRequired = false;
+
+            // Yeni Scene'e geçildiðinde: bu kapýnýn jeneratörü daha önce açýldýysa kapýyý aç
+            if (PlayerInventory.Inventory != null &&
+                PlayerInventory.Inventory.OpenedGenerators.Contains(ConnectedGeneratorName))
+            {
+                OpenedDoor();
+            }
         }
     }
 }

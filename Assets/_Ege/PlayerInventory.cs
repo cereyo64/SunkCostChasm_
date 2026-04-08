@@ -6,6 +6,7 @@ public class PlayerInventory : MonoBehaviour
 {
     [Header("Seviye keþif objeleri")]
     public List<string> Keys;
+    public List<string> OpenedGenerators;
 
     [Header("Saðlýk Objeler")]
     public int HealthKitCount;
