@@ -81,13 +81,30 @@ public class RoomManager : MonoBehaviour
             {
                 currentRoom = room;
                 room.gameObject.SetActive(true);
+
+
+
                 continue;
             }
 
             room.gameObject.SetActive(false);
         }
 
-        
+        switch (currentRoom.transitionSettings.baseCameraBehaviour)
+        {
+            case CameraManager.CameraBehaviour.PlayerFollowCamera:
+
+                CameraEvents.SwitchToPlayerFollowCamera();
+
+                break;
+
+            case CameraManager.CameraBehaviour.RoomCamera:
+
+                CameraEvents.SwitchToRoomCamera(currentRoom);
+
+                break;
+        }
+
 
     }
 

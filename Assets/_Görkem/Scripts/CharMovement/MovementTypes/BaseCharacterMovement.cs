@@ -86,7 +86,7 @@ public class BaseCharacterMovement : MovementTypeBase
     {
         RaycastHit2D hit2D = Physics2D.Raycast((Vector2)transform.position, Vector2.down, rayDistance, groundLayer);
 
-      // RaycastHit2D middleGroundCast = Physics2D.Raycast((Vector2)transform.position, Vector2.down, rayDistance, groundLayer);
+       // RaycastHit2D middleGroundCast = Physics2D.Raycast((Vector2)transform.position, Vector2.down, rayDistance, groundLayer);
 
         RaycastHit2D forwardCast = Physics2D.Raycast((Vector2)transform.position, transform.right, wallCheckDistance, wallLayer);
 

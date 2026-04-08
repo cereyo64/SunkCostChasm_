@@ -8,6 +8,7 @@ TagManager:
   - StartingRoom
   - PlayerFollowCam
   - RoomCam
+  - Ladder
   layers:
   - Default
   - TransparentFX

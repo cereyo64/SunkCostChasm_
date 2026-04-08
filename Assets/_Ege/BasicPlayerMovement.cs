@@ -16,6 +16,10 @@ public class BasicPlayerMovement : MonoBehaviour, IHaveHealth
     public float StaminaIncraseRate;
     public float StaminaDecraseRate;
 
+    public Transform[] flippableVisuals;
+
+    public Transform lightTransform;
+   
     [Header("Zemin Kontrolü")]
     public Transform groundCheck;
     public float checkRadius = 0.2f;
@@ -29,7 +33,7 @@ public class BasicPlayerMovement : MonoBehaviour, IHaveHealth
     private Rigidbody2D rb;
     private bool isGrounded;
     private float moveInput;
-    
+    private float lightRotateRate;
 
     void Start()
     {
@@ -108,8 +112,27 @@ public class BasicPlayerMovement : MonoBehaviour, IHaveHealth
         rb.linearVelocity = new Vector2(moveInput * MoveSpeed, rb.linearVelocity.y);
 
         // Karakterin yönünü çevirme (Flip)
-        if (moveInput > 0) transform.localScale = new Vector3(1, 1, 1);
-        else if (moveInput < 0) transform.localScale = new Vector3(-1, 1, 1);
+
+        if(moveInput > 0)
+        {
+            foreach(Transform t in flippableVisuals)
+            {
+                t.rotation = Quaternion.Euler(t.rotation.x, 0, t.rotation.z);
+                
+            }
+        }
+        else if (moveInput < 0)
+        {
+            foreach (Transform t in flippableVisuals)
+            {
+                t.rotation = Quaternion.Euler(t.rotation.x, -180, t.rotation.z);
+                lightTransform.Rotate(Vector3.forward, lightRotateRate * Mathf.Deg2Rad * Time.fixedDeltaTime);
+            }
+        }
+
+        //if (moveInput > 0) transform.localScale = new Vector3(1, 1, 1);
+        //else if (moveInput < 0) transform.localScale = new Vector3(-1, 1, 1);
+
     }
 
     public void TakeDamage(int damageAmount)
