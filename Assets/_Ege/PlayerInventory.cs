@@ -1,55 +1,32 @@
+using NUnit.Framework;
 using UnityEngine;
+using System.Collections.Generic;
 
 public class PlayerInventory : MonoBehaviour
 {
     [Header("Seviye keþif objeleri")]
-    public bool HaveImportentKey;
-    public int BasicKeyCount;
+    public List<string> Keys;
 
     [Header("Saðlýk Objeler")]
     public int HealthKitCount;
     public int HealthKitHealAmount;
     public int EnergyBarCount;
 
-    // ===================================================== BASIC KEY =====================================================
+    public static PlayerInventory Inventory;
 
-    public void AddBasicKey()
-    {
-        BasicKeyCount++;
-    }
+    // ===================================================== HEALTH KIT =====================================================
 
-    public void useBasicKey()
+    public void Start()
     {
-        if (BasicKeyCount > 0)
+        if (Inventory == null)
         {
-            BasicKeyCount--;
+            Inventory = this;
         }
         else
         {
-            Debug.Log("Yeterli anahtar yok!");
+            Destroy(gameObject);
         }
     }
-
-    // ===================================================== IMPROTENT KEY =====================================================
-
-    public void GetHaveImportentKey()
-    {
-        if(HaveImportentKey)
-        {
-            Debug.Log("Zaten önemli anahtar var!");
-            return;
-        }
-        HaveImportentKey = true;
-        print("Artýk önemli kapý açýlacak");
-    }
-
-    public void UseHaveImportentKey()
-    {
-        HaveImportentKey = false;
-        print("Önemli kapý açýldý");
-    }
-
-    // ===================================================== HEALTH KIT =====================================================
 
     public void AddHealthKit()
     {

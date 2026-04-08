@@ -6,7 +6,13 @@ public class Doors : MonoBehaviour, IInteractable
     public string interactionName;
     public string leadingRoom;
     public string requiredItemName;
+
+    [Header("Kapý seçenekleri")]
     public bool canInteract = true;
+    public bool KeyRequired;
+    public bool DestroyKeyOnUse;
+
+
     public string RequiredItemName { get => requiredItemName ; set => requiredItemName = value; }
     public bool CanInteract { get => canInteract ; set => canInteract = value; }
     public string InteractionName { get => interactionName ; set => interactionName = value; }
@@ -15,7 +21,15 @@ public class Doors : MonoBehaviour, IInteractable
 
     public void Interact()
     {
-        SendPlayerToNextRoom();
+        if (KeyRequired)
+        {
+            InteractWithItem(requiredItemName);
+        }
+        else
+        {
+            SendPlayerToNextRoom();
+        }
+        
     }
     public void InteractCancel()
     {
@@ -32,18 +46,40 @@ public class Doors : MonoBehaviour, IInteractable
 
     public void InteractWithItem(string itemName)
     {
-        if (itemName == RequiredItemName)
+        if (KeyRequired)
         {
-            SendPlayerToNextRoom();
+            if (PlayerInventory.Inventory.Keys.Contains(itemName))
+            {
+                SendPlayerToNextRoom();
+                KeyRequired = false;
+                if(DestroyKeyOnUse) PlayerInventory.Inventory.Keys.Remove(itemName);
+            }
+            else
+            {
+                print("You need the correct key to open this door.");
+            }
         }
+        
        
     }
     public void SendPlayerToNextRoom()
     {
 
         RoomEvents.SwitchToNewRoom(leadingRoom);
-
+        
         Debug.Log($"Player travels to {leadingRoom}");
     }
-   
+
+    public void Start()
+    {
+        if(requiredItemName == "")
+        {
+            KeyRequired = false;
+            DestroyKeyOnUse = false;
+        }
+        else
+        {
+            KeyRequired = true;
+        }
+    }
 }
